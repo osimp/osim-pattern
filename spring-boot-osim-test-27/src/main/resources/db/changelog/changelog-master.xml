@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="0" author="isazonov">
+        <createTable tableName="ts_products">
+            <column name="product_id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="external_product_id" type="uuid"/>
+            <column name="parent_product_id" type="uuid"/>
+            <column name="name" type="varchar(255)"/>
+            <column name="type" type="varchar(255)"/>
+            <column name="price" type="integer"/>
+            <column name="version" type="integer"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
