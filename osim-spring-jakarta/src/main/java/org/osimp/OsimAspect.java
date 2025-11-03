@@ -13,7 +13,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Aspect
 public class OsimAspect {
 
-
     private final EntityManagerFactory emf;
 
     public OsimAspect(
@@ -27,12 +26,17 @@ public class OsimAspect {
         if (TransactionSynchronizationManager.hasResource(emf)) {
             return pjp.proceed();
         }
-        try (EntityManager em = emf.createEntityManager()) {
+
+        EntityManager em;
+        try {
+            em = emf.createEntityManager();
+        } catch (PersistenceException ex) {
+            throw new DataAccessResourceFailureException("Could not create JPA EntityManager", ex);
+        }
+        try (em) {
             EntityManagerHolder emHolder = new EntityManagerHolder(em);
             TransactionSynchronizationManager.bindResource(emf, emHolder);
             return pjp.proceed();
-        } catch (PersistenceException ex) {
-            throw new DataAccessResourceFailureException("Could not create JPA EntityManager", ex);
         } finally {
             TransactionSynchronizationManager.unbindResourceIfPossible(emf);
         }
