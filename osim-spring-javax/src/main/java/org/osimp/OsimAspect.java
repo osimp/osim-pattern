@@ -28,14 +28,16 @@ public class OsimAspect {
             return pjp.proceed();
         }
 
-        EntityManager em = null;
+        EntityManager em;
         try {
             em = emf.createEntityManager();
+        } catch (PersistenceException ex) {
+            throw new DataAccessResourceFailureException("Could not create JPA EntityManager", ex);
+        }
+        try {
             EntityManagerHolder emHolder = new EntityManagerHolder(em);
             TransactionSynchronizationManager.bindResource(emf, emHolder);
             return pjp.proceed();
-        } catch (PersistenceException ex) {
-            throw new DataAccessResourceFailureException("Could not create JPA EntityManager", ex);
         } finally {
             if (em != null) {
                 Exception ex = null;
@@ -49,10 +51,12 @@ public class OsimAspect {
                 } catch (Exception e) {
                     if (ex != null) {
                         e.addSuppressed(ex);
+                        //noinspection ThrowFromFinallyBlock
                         throw e;
                     }
                 }
                 if (ex != null) {
+                    //noinspection ThrowFromFinallyBlock
                     throw ex;
                 }
             }
